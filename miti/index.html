@@ -39,16 +39,17 @@ const j=(p,o={})=>fetch(API+p,{...o,headers:{...(o.headers||{}),"x-pass":PW}}).t
 const first=n=>(n||"").split(" ")[0];const brandsOf=it=>[...new Set(it.map(x=>x.brand).filter(Boolean))].join(" and ");
 const sms=(ph,body)=>`sms:${ph}${/iPhone|iPad/.test(navigator.userAgent)?"&":"?"}body=${encodeURIComponent(body)}`;
 let IG="https://www.instagram.com/laurenp_elysewalker";let IGM={};
+let ME="Miti";const intro=e=>IGM[e.customer_id]?"":` It's ${ME} from Elyse Walker Calabasas.`;
 const igl=e=>(!IG||IGM[e.customer_id])?"":` Follow me on Instagram for new arrivals: ${IG}`;
 const cleanItem=s=>String(s||"").replace(/\s*\(.*?\)\s*/g," ").replace(/\s+[–—-]\s+.*$/,"").replace(/,\s*(XXS|XS|S|M|L|XL|XXL|\d+(\.\d+)?)\s*$/i,"").replace(/\s+/g," ").trim().toLowerCase();
 const niceBrand=b=>{b=String(b||"").trim();return b&&b===b.toUpperCase()?b.toLowerCase().replace(/(^|[\s\/-])(\p{L})/gu,(m,p,c)=>p+c.toUpperCase()):b};
 const itemsTxt=it=>{const seen=new Set();const L=[...it].sort((a,b)=>(b.amount||0)-(a.amount||0)).map(x=>[niceBrand(x.brand),cleanItem(x.item)].filter(Boolean).join(" ")).filter(s=>s&&!seen.has(s.toLowerCase())&&seen.add(s.toLowerCase()));if(!L.length)return "pieces";if(L.length>3)return L.slice(0,3).join(", ")+" and other items";return L.length>1?L.slice(0,-1).join(", ")+" and "+L.at(-1):L[0]};
-const tpl={thank:e=>`Hi ${first(e.name)}! Thank you so much for shopping with me. I hope you love your new ${itemsTxt(e.items)}! Let me know if you need anything at all.${igl(e)}`,
-follow:e=>`Hi ${first(e.name)}! It's been about a month since you picked up your ${brandsOf(e.items)||"pieces"} — how are you loving them? We have some beautiful new arrivals I'd love to show you.${igl(e)}`,
-lapsed:e=>`Hi ${first(e.name)}! It's been a little while and I've been thinking of you. We have so many new pieces in${e.brands?` — including some ${e.brands.split(",")[0]}`:""}. Would love to see you soon!${igl(e)}`,
-bday:e=>`Happy birthday, ${first(e.name)}! Wishing you the most beautiful day. Come celebrate with us — I'd love to help you pick out something special.${igl(e)}`,
-wish:(n,b,e={})=>`Hi ${first(n)}! You mentioned you love ${b} — we just got new pieces in and I thought of you right away. Want me to pull some for you to try?${igl(e)}`,
-brand:(n,b,e={})=>`Hi ${first(n)}! We just got new ${b} in and I thought of you right away. Want me to set some pieces aside for you?${igl(e)}`};
+const tpl={thank:e=>`Hi ${first(e.name)}!${intro(e)} Thank you so much for shopping with me. I hope you love your new ${itemsTxt(e.items)}! Let me know if you need anything at all.${igl(e)}`,
+follow:e=>`Hi ${first(e.name)}!${intro(e)} It's been about a month since you picked up your ${brandsOf(e.items)||"pieces"} — how are you loving them? We have some beautiful new arrivals I'd love to show you.${igl(e)}`,
+lapsed:e=>`Hi ${first(e.name)}!${intro(e)} It's been a little while and I've been thinking of you. We have so many new pieces in${e.brands?` — including some ${e.brands.split(",")[0]}`:""}. Would love to see you soon!${igl(e)}`,
+bday:e=>`Happy birthday, ${first(e.name)}!${intro(e)} Wishing you the most beautiful day. Come celebrate with us — I'd love to help you pick out something special.${igl(e)}`,
+wish:(n,b,e={})=>`Hi ${first(n)}!${intro(e)} You mentioned you love ${b} — we just got new pieces in and I thought of you right away. Want me to pull some for you to try?${igl(e)}`,
+brand:(n,b,e={})=>`Hi ${first(n)}!${intro(e)} We just got new ${b} in and I thought of you right away. Want me to set some pieces aside for you?${igl(e)}`};
 function msgCard(e,kind,body,ids){const id="m"+Math.random().toString(36).slice(2);
  return `<div class="card"><div class="row"><div><div class="name">${esc(e.name)}</div><div class="meta">${e.date?("Purchased "+e.date+" · "):""}${esc(e.phone||"no phone on file")}</div></div></div>
  <div>${(e.items||[]).map(i=>`<span class="tag">${esc(i.brand||"—")}${i.item?" · "+esc(i.item):""}</span>`).join("")}</div>
