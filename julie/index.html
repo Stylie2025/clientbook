@@ -40,7 +40,8 @@ const first=n=>(n||"").split(" ")[0];const brandsOf=it=>[...new Set(it.map(x=>x.
 const sms=(ph,body)=>`sms:${ph}${/iPhone|iPad/.test(navigator.userAgent)?"&":"?"}body=${encodeURIComponent(body)}`;
 let IG="https://www.instagram.com/laurenp_elysewalker";let IGM={};
 const igl=e=>(!IG||IGM[e.customer_id])?"":` Follow me on Instagram for new arrivals: ${IG}`;
-const itemsTxt=it=>{const L=it.map(x=>[x.brand,x.item].filter(Boolean).join(" ")).filter(Boolean);return L.length>1?L.slice(0,-1).join(", ")+" and "+L.at(-1):L[0]||"pieces"};
+const cleanItem=s=>String(s||"").replace(/\s*\(.*?\)\s*/g," ").replace(/\s+[–—-]\s+.*$/,"").replace(/,\s*(XXS|XS|S|M|L|XL|XXL|\d+(\.\d+)?)\s*$/i,"").replace(/\s+/g," ").trim();
+const itemsTxt=it=>{const seen=new Set();const L=[...it].sort((a,b)=>(b.amount||0)-(a.amount||0)).map(x=>[x.brand,cleanItem(x.item)].filter(Boolean).join(" ")).filter(s=>s&&!seen.has(s.toLowerCase())&&seen.add(s.toLowerCase()));if(!L.length)return "pieces";if(L.length>3)return L.slice(0,3).join(", ")+" and other items";return L.length>1?L.slice(0,-1).join(", ")+" and "+L.at(-1):L[0]};
 const tpl={thank:e=>`Hi ${first(e.name)}! Thank you so much for shopping with me. I hope you love your new ${itemsTxt(e.items)}! Let me know if you need anything at all.${igl(e)}`,
 follow:e=>`Hi ${first(e.name)}! It's been about a month since you picked up your ${brandsOf(e.items)||"pieces"} — how are you loving them? We have some beautiful new arrivals I'd love to show you.${igl(e)}`,
 lapsed:e=>`Hi ${first(e.name)}! It's been a little while and I've been thinking of you. We have so many new pieces in${e.brands?` — including some ${e.brands.split(",")[0]}`:""}. Would love to see you soon!${igl(e)}`,
