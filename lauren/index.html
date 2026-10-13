@@ -50,6 +50,7 @@ lapsed:e=>`Hi ${first(e.name)}!${intro(e)} It's been a little while and I've bee
 bday:e=>`Happy birthday, ${first(e.name)}!${intro(e)} Wishing you the most beautiful day. Come celebrate with us — I'd love to help you pick out something special.${igl(e)}`,
 wish:(n,b,e={})=>`Hi ${first(n)}!${intro(e)} You mentioned you love ${b} — we just got new pieces in and I thought of you right away. Want me to pull some for you to try?${igl(e)}`,
 brand:(n,b,e={})=>`Hi ${first(n)}!${intro(e)} We just got new ${b} in and I thought of you right away. Want me to set some pieces aside for you?${igl(e)}`};
+const SIG="\n\nXO\n~Lauren";for(const k in tpl){const fn=tpl[k];tpl[k]=(...a)=>fn(...a)+SIG}
 function msgCard(e,kind,body,ids){const id="m"+Math.random().toString(36).slice(2);
  return `<div class="card"><div class="row"><div><div class="name">${esc(e.name)}</div><div class="meta">${e.date?("Purchased "+e.date+" · "):""}${esc(e.phone||e.email||"no phone on file")}</div></div></div>
  <div>${(e.items||[]).map(i=>`<span class="tag">${esc(i.brand||"—")}${i.item?" · "+esc(i.item):""}</span>`).join("")}</div>
