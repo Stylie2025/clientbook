@@ -54,10 +54,12 @@ function msgCard(e,kind,body,ids){const id="m"+Math.random().toString(36).slice(
  return `<div class="card"><div class="row"><div><div class="name">${esc(e.name)}</div><div class="meta">${e.date?("Purchased "+e.date+" · "):""}${esc(e.phone||e.email||"no phone on file")}</div></div></div>
  <div>${(e.items||[]).map(i=>`<span class="tag">${esc(i.brand||"—")}${i.item?" · "+esc(i.item):""}</span>`).join("")}</div>
  <textarea id="${id}">${esc(body)}</textarea><div class="row" style="justify-content:flex-start">
- ${e.phone?`<a class="btn" href="#" onclick="location.href=sms('${e.phone}',document.getElementById('${id}').value);return false">Open text</a>`:(e.email?"":`<button class="btn" disabled>No phone</button>`)}
- ${e.email?`<a class="btn${e.phone?" ghost":""}" href="#" onclick="location.href='ms-outlook://compose?to='+encodeURIComponent('${esc(e.email)}')+'&subject='+encodeURIComponent('${kind=="thank"?"Thank you for Stopping By!":"From "+ME+" at Elyse Walker Calabasas"}')+'&body='+encodeURIComponent(document.getElementById('${id}').value);return false">Open in Outlook</a>`:""}
+ ${e.phone?`<a class="btn" href="#" onclick="autoDone(this,'${kind}','${ids||''}',${e.customer_id||0},${e.touch?1:0});location.href=sms('${e.phone}',document.getElementById('${id}').value);return false">Open text</a>`:(e.email?"":`<button class="btn" disabled>No phone</button>`)}
+ ${e.email?`<a class="btn${e.phone?" ghost":""}" href="#" onclick="autoDone(this,'${kind}','${ids||''}',${e.customer_id||0},${e.touch?1:0});location.href='ms-outlook://compose?to='+encodeURIComponent('${esc(e.email)}')+'&subject='+encodeURIComponent('${kind=="thank"?"Thank you for Stopping By!":"From "+ME+" at Elyse Walker Calabasas"}')+'&body='+encodeURIComponent(document.getElementById('${id}').value);return false">Open in Outlook</a>`:""}
  ${ids?`<button class="btn ghost" onclick="done(this,'${kind}','${ids}',${e.customer_id||0})">Mark done</button>`:""}${e.touch?`<button class="btn ghost" onclick="touch(this,'${kind}',${e.customer_id})">Mark done</button>`:""}</div></div>`}
 async function touch(b,kind,id){post("/api/ig/"+id,{});IGM[id]=1;await post("/api/touch",{kind,customer_id:id,date:TODAY});b.closest(".card").remove()}
+function bg(p,b){try{fetch(API+p,{method:"POST",keepalive:true,headers:{"Content-Type":"application/json","x-pass":PW},body:JSON.stringify(b||{})})}catch(e){}}
+function autoDone(b,kind,ids,cid,t){if(cid){bg("/api/ig/"+cid);IGM[cid]=1}if(t)bg("/api/touch",{kind,customer_id:cid,date:TODAY});else if(ids)bg("/api/mark",{kind,sale_ids:ids.split(",").map(Number)});const c=b.closest(".card");setTimeout(()=>c&&c.remove(),400)}
 async function done(b,kind,ids,cid){if(cid){post("/api/ig/"+cid,{});IGM[cid]=1}await post("/api/mark",{kind,sale_ids:ids.split(",").map(Number)});b.closest(".card").remove()}
 const views={
 async today(){const LD=+(window.__ld||90);const d=await j("/api/today?d="+TODAY+"&days="+LD);
